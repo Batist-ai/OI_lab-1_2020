@@ -158,10 +158,12 @@
   <ItemGroup>
     <ClCompile Include="OI_lab 1_2020.cpp" />
     <ClCompile Include="qmetrics.cpp" />
+    <ClCompile Include="rgbhsv.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OI_lab 1_2020.h" />
     <ClInclude Include="qmetrics.h" />
+    <ClInclude Include="rgbhsv.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

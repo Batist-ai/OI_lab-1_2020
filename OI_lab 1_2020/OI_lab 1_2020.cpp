@@ -7,12 +7,16 @@
 #include <iostream>
 
 #include "qmetrics.h"
+#include "rgbhsv.h"
 #include "OI_lab 1_2020.h"
 
+#define CLAMP(_v, _min, _max)\
+	(_v < _min ? _min: _v > _max ? _max: _v)
 
 using namespace cv;
 using namespace std;
 using namespace qm;
+using namespace rgbhsv;
 
 
 /**
@@ -21,8 +25,8 @@ using namespace qm;
  */
 int main(int argc, char** argv)
 {
-	//part_one();
-	//part_two();
+	part_one();
+	part_two();
 	part_three();
 
 	return 0;
@@ -103,8 +107,6 @@ void part_two()
 	waitKey(2000);
 	imwrite("D:\\3e635-gs-cvtcolor.jpg", img_1_gs_cvtcolor);
 
-
-
 	//for (int row = 0; row < img_1.rows; row++) {
 	//	for (int col = 0; col < img_1.cols; col++) {
 	//		Vec3b pixel_color(img_1.data[row, col]);
@@ -119,9 +121,6 @@ void part_two()
 	//	}
 	//}
 }
-
-
-
 char RGB_window[30] = "RGB Window";
 char HSV_window[30] = "HSV Window";
 Mat src, hsv;
@@ -134,7 +133,7 @@ static void onMouse(int event, int x, int y, int f, void*) {
 	int R = rgb.val[2];
 
 	Mat HSV;
-	Mat RGB = image(Rect(x, y, 1, 1));//capture that pixel in its own ROI
+	Mat RGB = image(Rect(x, y, 1, 1)); //capture that pixel in its own ROI
 	cvtColor(RGB, HSV, CV_BGR2HSV);
 
 	Vec3b hsv = HSV.at<Vec3b>(0, 0);
@@ -174,17 +173,38 @@ static void onMouse(int event, int x, int y, int f, void*) {
 
 }
 
+uchar clamp_uc(uint min, uint max, uint value)
+{
+	return (uchar)(value < min ? min : value > max ? max : value);
+}
 
+void bright(Mat src, Mat &result, int brightness)
+{
+	typedef cv::Point3_<uint8_t> Pixel;
+	result = src.clone();
+	result.forEach<Pixel>([brightness](Pixel &p, const int * position) -> void {
+		p.x = clamp_uc(0, 255, (p.x + brightness));
+		p.y = clamp_uc(0, 255, (p.y + brightness));
+		p.z = clamp_uc(0, 255, (p.z + brightness));
+	});
+}
 
-
-
-void part_three() {
+void bright_hsv(Mat src, Mat &result, int brightness)
+{
+	typedef cv::Point3_<uint8_t> Pixel;
+	result = src.clone();
+	result.forEach<Pixel>([brightness](Pixel &p, const int * position) -> void {
+		p.z = clamp_uc(0, 255, (p.z + brightness));
+	});
+}
+void part_three() 
+{
 	char img_1_name[] = "D:\\3e635.jpg";
 	char img_1_gs_name[] = "D:\\3e635-gs.jpg";
 	char img_1_cvgs_name[] = "D:\\3e635-cvgs.jpg";
 
-	Mat3f img_1 = Mat3f(imread(img_1_name));
-	img_1 /= 255;
+	Mat3b img_1 = imread(img_1_name);
+	//img_1 /= 255;
 	//imshow("Test", img_1);
 	//waitKey(6000);
 	if (!img_1.data) {
@@ -194,31 +214,77 @@ void part_three() {
 	imshow("src", img_1);
 	waitKey(2000);
 
-	Mat3f img_1_hsv;
+	// Преобразуем RGB в HSV средствами opencv
+	//Mat img_1_hsv = img_1.clone();
+	Mat3b img_1_hsv;
 	cvtColor(img_1, img_1_hsv, CV_BGR2HSV);
-	img_1_hsv *= 1./255.;
 	imshow("bgr2hsv_cvtcolor", img_1_hsv);
 	waitKey(5000);
 
-	typedef cv::Point3_<uint8_t> Pixel;
-	Mat3f img_1_hsv1 = img_1;
-	img_1_hsv1.forEach<Vec3f>([](Vec3f &p, const int * position) -> void {
-		double value = (p[0] + p[1] + p[2]) / 3;
-		p[0] = value;
-		p[1] = value;
-		p[2] = value;
-	});
-	
-	
-	for (int row = 0; row < img_1.rows; row++) {
-		for (int col = 0; col < img_1.cols; col++) {
-			Vec3f pixel = Vec3f(0, 0, 0);
-			Vec3b pixel_color(img_1.data[row, col]);
-			img_1_hsv1(row, col) = pixel;
+	// Преобразуем RGB в HSV средствами своей реализации конвертации
+	Mat3b img = img_1.clone();   
+	for (int i = 0; i < img.rows; i++) {
+		for (int j = 0; j < img.cols; j++) {
+			Vec3b rgb_pixel = img_1(i, j);
+			float h, s, v;
+			rgb_to_hsv(rgb_pixel[0], rgb_pixel[1], rgb_pixel[2], &h, &s, &v);
+			Vec3b hsv_pixel = Vec3b((uchar)h, (uchar)(s*255), (uchar)(v*255));
+			img(i, j) = hsv_pixel;
 		}
 	}
-	imshow("bgr2hsv1_cvtcolor", img_1_hsv1);
+	//imshow("bgr2hsv1", img);
+	//waitKey(5000);
+
+	// Применяем фильтр яркости для rgb
+	Mat img_bright = img_1.clone();
+	bright(img_1, img_bright, 50);
+	//imshow("img_1_bright", img_bright);
+	//waitKey(5000);
+
+	printf("\nMetrics of source rgb file and bright version\n");
+	compute_quality_metrics(img_1, img_bright, 10);
+
+	// Применяем фильтр яркости для hsv
+	Mat img_hsv_bright = img_1_hsv.clone();
+	bright_hsv(img_1_hsv, img_hsv_bright, -50);
+	imshow("img_hsv_bright", img_hsv_bright);
 	waitKey(5000);
+
+	printf("\nMetrics of source hsv file and bright version\n");
+	compute_quality_metrics(img_1_hsv, img_hsv_bright, 10);
+
+	//Mat3b img_1_hsv1 = img_1.clone();
+	//for (int row = 0; row < img_1.rows; row++) {
+	//	for (int col = 0; col < img_1.cols; col++) {
+	//		Vec3b pixel = Vec3b(0, 0, 0);
+	//		Vec3b pixel_color = img_1.at<Vec3b>(row, col);
+	//		//img_1.at<Vec3b>(row, col) = pixel;
+	//		//img_1_hsv1(row, col) = pixel;
+	//	}
+	//}
+	//imshow("bgr2hsv1_cvtcolor", img_1_hsv1);
+	//waitKey(5000);
+
+	//typedef cv::Point3_<uint8_t> Pixel;
+	//Mat3f img_1_hsv1 = img_1;
+	//img_1_hsv1.forEach<Vec3f>([](Vec3f &p, const int * position) -> void {
+	//	double value = (p[0] + p[1] + p[2]) / 3;
+	//	p[0] = value;
+	//	p[1] = value;
+	//	p[2] = value;
+	//});
+	//
+	//
+	//for (int row = 0; row < img_1.rows; row++) {
+	//	for (int col = 0; col < img_1.cols; col++) {
+	//		Vec3f pixel = Vec3f(0, 0, 0);
+	//		Vec3b pixel_color(img_1.data[row, col]);
+	//		img_1_hsv1(row, col) = pixel;
+	//	}
+	//}
+	//imshow("bgr2hsv1_cvtcolor", img_1_hsv1);
+	//waitKey(5000);
+	
 	return;
 
 	static int Bs = 0, Gs = 0, Rs = 0;

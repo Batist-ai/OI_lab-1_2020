@@ -72,7 +72,6 @@ namespace qm
 	}
 
 
-
 	/**
 	 *	Compute the PSNR between 2 images
 	 */
@@ -81,7 +80,6 @@ namespace qm
 		int D = 255;
 		return (10 * log10((D*D) / eqm(img_src, img_compressed)));
 	}
-
 
 	/**
 	 * Compute the SSIM between 2 images
@@ -126,7 +124,6 @@ namespace qm
 
 	void compute_quality_metrics(char * file1, char * file2, int block_size)
 	{
-
 		Mat img_src;
 		Mat img_compressed;
 
@@ -134,7 +131,11 @@ namespace qm
 		img_src = imread(file1, CV_LOAD_IMAGE_GRAYSCALE);
 		img_compressed = imread(file2, CV_LOAD_IMAGE_GRAYSCALE);
 
+		compute_quality_metrics(img_src, img_compressed, block_size);
+	}
 
+	void compute_quality_metrics(Mat img_src, Mat img_compressed, int block_size)
+	{
 		img_src.convertTo(img_src, CV_64F);
 		img_compressed.convertTo(img_compressed, CV_64F);
 
