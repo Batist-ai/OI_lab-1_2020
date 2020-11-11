@@ -156,12 +156,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Filters.cpp" />
     <ClCompile Include="OI_lab 1_2020.cpp" />
     <ClCompile Include="qmetrics.cpp" />
     <ClCompile Include="rgbhsv.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Filters.h" />
     <ClInclude Include="OI_lab 1_2020.h" />
+    <ClInclude Include="pixel.h" />
     <ClInclude Include="qmetrics.h" />
     <ClInclude Include="rgbhsv.h" />
   </ItemGroup>

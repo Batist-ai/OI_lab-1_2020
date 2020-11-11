@@ -8,9 +8,12 @@
 #include <vector>
 #include <random>
 
+#include "pixel.h"
 #include "qmetrics.h"
 #include "rgbhsv.h"
+#include "filters.h"
 #include "OI_lab 1_2020.h"
+
 
 #define CLAMP(_v, _min, _max)\
 	(_v < _min ? _min: _v > _max ? _max: _v)
@@ -412,16 +415,34 @@ void part_four()
     }
     printf("cols: %d, rows: %d\n", img_1.cols, img_1.rows);
 
-    Mat img_2 = apply_constant_noise(img_1, bad_pixels);
-    imshow("Constant noise", img_2);
+    Mat img_with_noise = apply_constant_noise(img_1, bad_pixels);
+    imshow("Constant noise", img_with_noise);
+    waitKey(10);
+    
+    printf("\n\nQuality metrics for image with noise\n");
+    compute_quality_metrics(img_1, img_with_noise, 10);
+
+    auto gf = new GaussianFilter(1, 2.0);
+    
+    Mat img_after_gf = gf->processImage(img_with_noise);
+    imshow("Noised image after gf", img_after_gf);
+    waitKey(10);
+    printf("\n\nQuality metrics for image with filtered noise [GaussianFilter]\n");
+    compute_quality_metrics(img_1, img_after_gf, 10);
+    
+    auto mf = new MedianFilter();
+
+    Mat img_after_mf = mf->processImage(img_with_noise);
+    imshow("Noised image after mf", img_after_mf);
     waitKey(16000);
-   
+    printf("\n\nQuality metrics for image with filtered noise [MedianFilter]\n");
+    compute_quality_metrics(img_1, img_after_mf, 10);
 
     //printf("avg1=%f, dev1=%f, avg2=%f, dev2=%f\n\n", img_1_mean.val[0], img_1_dev.val[0], img_2_mean.val[0], img_2_dev.val[0]);
 
     waitKey(0);
 
-    compute_quality_metrics(img_1, img_2, 10);
+
 }
 
 
