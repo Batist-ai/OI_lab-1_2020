@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <chrono> 
 
 #include "pixel.h"
 #include "qmetrics.h"
@@ -20,6 +21,7 @@
 
 using namespace cv;
 using namespace std;
+using namespace std::chrono;
 using namespace qm;
 using namespace rgbhsv;
 
@@ -424,21 +426,54 @@ void part_four()
 
     auto gf = new GaussianFilter(1, 2.0);
     
+    auto start = high_resolution_clock::now();
     Mat img_after_gf = gf->processImage(img_with_noise);
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<std::chrono::milliseconds>(stop - start);
     imshow("Noised image after gf", img_after_gf);
     waitKey(10);
-    printf("\n\nQuality metrics for image with filtered noise [GaussianFilter]\n");
+    printf("\n\nQuality metrics for image with filtered noise [GaussianFilter (%d ms)]\n", duration.count());
     compute_quality_metrics(img_1, img_after_gf, 10);
     
     auto mf = new MedianFilter();
 
+    start = high_resolution_clock::now();
     Mat img_after_mf = mf->processImage(img_with_noise);
     imshow("Noised image after mf", img_after_mf);
-    waitKey(16000);
-    printf("\n\nQuality metrics for image with filtered noise [MedianFilter]\n");
+    stop = high_resolution_clock::now();
+    duration = duration_cast<std::chrono::milliseconds>(stop - start);
+    waitKey(5000);
+    printf("\n\nQuality metrics for image with filtered noise [MedianFilter (%d ms)]\n", duration.count());
     compute_quality_metrics(img_1, img_after_mf, 10);
 
     //printf("avg1=%f, dev1=%f, avg2=%f, dev2=%f\n\n", img_1_mean.val[0], img_1_dev.val[0], img_2_mean.val[0], img_2_dev.val[0]);
+    //Mat img_with_cv_noise = imnoise(img_1, 'salt & pepper', 0.02);
+    
+    //imshow("Constant noise", img_with_noise);
+    //waitKey(10);
+
+    Mat img_after_opencv_gf;
+    size_t kernel_size = 3;
+    double sigma = 2.0;
+    start = high_resolution_clock::now();
+    GaussianBlur(img_1, img_after_opencv_gf, Size(kernel_size, kernel_size), sigma);
+    stop = high_resolution_clock::now();
+    duration = duration_cast<std::chrono::milliseconds>(stop - start); 
+    imshow("Noised image after opencv gf", img_after_opencv_gf);
+    printf("\n\nQuality metrics for image with filtered noise [GaussianFilter (%d ms)]\n", duration.count());
+    compute_quality_metrics(img_after_gf, img_after_opencv_gf, 10);
+    waitKey(5000);
+
+    Mat img_after_opencv_mf;
+    start = high_resolution_clock::now();
+    medianBlur(img_1, img_after_opencv_mf, 3);
+    stop = high_resolution_clock::now();
+    duration = duration_cast<std::chrono::milliseconds>(stop - start);
+    imshow("Noised image after opencv mf", img_after_opencv_mf);
+    printf("\n\nQuality metrics for image with filtered noise [MedianFilter (%d ms)]\n", duration.count());
+    compute_quality_metrics(img_after_mf, img_after_opencv_mf, 10);
+    waitKey(5000);
+
 
     waitKey(0);
 

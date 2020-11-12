@@ -155,23 +155,41 @@ Pixel MedianFilter::calculateNewPixel(Mat sourceImage, int y, int x) {
     int radiusX = int(m_radius);
     int radiusY = int(m_radius);
 
+    std::vector<int> r(m_kernel.size());
+    std::vector<int> g(m_kernel.size());
+    std::vector<int> b(m_kernel.size());
+
     for (int i = -radiusY; i <= radiusY; i++) {
         for (int j = -radiusX; j <= radiusX; j++) {
             int idX = Clamp(x + j, 0, sourceImage.cols - 1);
             int idY = Clamp(y + i, 0, sourceImage.rows - 1);
             Pixel &p = sourceImage.at<Pixel>(idY, idX);
             int idK = (j + radiusX) * m_cols + i + radiusY;
-            m_kernel[idK] = (0.2126 * p.x + 0.7152 * p.y + 0.0722 * p.z);
+            //m_kernel[idK] = (0.2126 * p.x + 0.7152 * p.y + 0.0722 * p.z);
+            r[idK] = p.x;
+            g[idK] = p.y;
+            b[idK] = p.z;
         }
     }
-    sort(m_kernel.begin(), m_kernel.end());
-    int median_Y = Clamp(m_kernel[m_kernel.size() / 2], 0, 255);
+    //sort(m_kernel.begin(), m_kernel.end());
+    sort(r.begin(), r.end());
+    sort(g.begin(), g.end());
+    sort(b.begin(), b.end());
+    //int median_Y = Clamp(m_kernel[m_kernel.size() / 2], 0, 255);
+    int median_R = Clamp(r[r.size() / 2], 0, 255);
+    int median_G = Clamp(g[g.size() / 2], 0, 255);
+    int median_B = Clamp(b[b.size() / 2], 0, 255);
     Pixel &p = sourceImage.at<Pixel>(y, x);
     int br = 255;
+    //return Pixel(
+    //    p.x * median_Y / br,
+    //    p.y * median_Y / br,
+    //    p.z * median_Y / br
+    //);
     return Pixel(
-        p.x * median_Y / br,
-        p.y * median_Y / br,
-        p.z * median_Y / br
+        median_R,
+        median_G,
+        median_B
     );
 }
 
