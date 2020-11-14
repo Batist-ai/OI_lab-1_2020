@@ -114,20 +114,6 @@ void part_two()
 	imshow("gs_cvtcolor", img_1_gs_cvtcolor);
 	waitKey(2000);
 	imwrite("D:\\3e635-gs-cvtcolor.jpg", img_1_gs_cvtcolor);
-
-	//for (int row = 0; row < img_1.rows; row++) {
-	//	for (int col = 0; col < img_1.cols; col++) {
-	//		Vec3b pixel_color(img_1.data[row, col]);
-	//		img_1.data[row, col] = Vec3b(pixel_color[0], pixel_color[1], pixel_color[2]);
-	//	}
-	//}
-
-	//IplImage img_1_array = img_1;
-	//for (int row = 0; row < img_1_array.width; row++) {
-	//	for (int col = 0; col < img_1_array.width; col++) {
-	//		img_1_array.imageData[col][row]
-	//	}
-	//}
 }
 char RGB_window[30] = "RGB Window";
 char HSV_window[30] = "HSV Window";
@@ -212,7 +198,6 @@ void part_three()
 	char img_1_cvgs_name[] = "D:\\3e635-cvgs.jpg";
 
 	Mat3b img_1 = imread(img_1_name);
-	//img_1 /= 255;
 	//imshow("Test", img_1);
 	//waitKey(6000);
 	if (!img_1.data) {
@@ -223,7 +208,6 @@ void part_three()
 	waitKey(2000);
 
 	// Преобразуем RGB в HSV средствами opencv
-	//Mat img_1_hsv = img_1.clone();
 	Mat3b img_1_hsv;
 	cvtColor(img_1, img_1_hsv, CV_BGR2HSV);
 	imshow("bgr2hsv_cvtcolor", img_1_hsv);
@@ -260,44 +244,10 @@ void part_three()
 
 	printf("\nMetrics of source hsv file and bright version\n");
 	compute_quality_metrics(img_1_hsv, img_hsv_bright, 10);
-
-	//Mat3b img_1_hsv1 = img_1.clone();
-	//for (int row = 0; row < img_1.rows; row++) {
-	//	for (int col = 0; col < img_1.cols; col++) {
-	//		Vec3b pixel = Vec3b(0, 0, 0);
-	//		Vec3b pixel_color = img_1.at<Vec3b>(row, col);
-	//		//img_1.at<Vec3b>(row, col) = pixel;
-	//		//img_1_hsv1(row, col) = pixel;
-	//	}
-	//}
-	//imshow("bgr2hsv1_cvtcolor", img_1_hsv1);
-	//waitKey(5000);
-
-	//typedef cv::Point3_<uint8_t> Pixel;
-	//Mat3f img_1_hsv1 = img_1;
-	//img_1_hsv1.forEach<Vec3f>([](Vec3f &p, const int * position) -> void {
-	//	double value = (p[0] + p[1] + p[2]) / 3;
-	//	p[0] = value;
-	//	p[1] = value;
-	//	p[2] = value;
-	//});
-	//
-	//
-	//for (int row = 0; row < img_1.rows; row++) {
-	//	for (int col = 0; col < img_1.cols; col++) {
-	//		Vec3f pixel = Vec3f(0, 0, 0);
-	//		Vec3b pixel_color(img_1.data[row, col]);
-	//		img_1_hsv1(row, col) = pixel;
-	//	}
-	//}
-	//imshow("bgr2hsv1_cvtcolor", img_1_hsv1);
-	//waitKey(5000);
-	
 	return;
 
 	static int Bs = 0, Gs = 0, Rs = 0;
 	namedWindow("colourCtrl");
-	//src = imread("bgr.png",1);
 	for (;;)
 	{
 		//cap>>src;
@@ -327,60 +277,24 @@ Mat apply_constant_noise(Mat img, std::vector<Pixel_Data> bad_pixels)
     for (int i = 0; i < bad_pixels.size(); i++) {
         Pixel_Data bad_pixel = bad_pixels[i];
         if (bad_pixel.x >= 0 && bad_pixel.x < img_out.cols && bad_pixel.y >= 0 && bad_pixel.y < img_out.rows) {
-            printf("rows: %d, cols: %d, x: %d, y: %d\n", img_out.rows, img_out.cols, bad_pixel.x, bad_pixel.y);
+          //  printf("rows: %d, cols: %d, x: %d, y: %d\n", img_out.rows, img_out.cols, bad_pixel.x, bad_pixel.y);
             img_out.at<Pixel>(bad_pixel.y, bad_pixel.x) = 
                 Pixel(bad_pixels[i].pixel.x, bad_pixels[i].pixel.y, bad_pixels[i].pixel.z);
         }
     }
     return img_out;
 
-    //for (int i = 0; i < img.rows; i++) {
-    //    for (int j = 0; j < img.cols; j++) {
-    //        Vec3b rgb_pixel = img_1(i, j);
-    //        float h, s, v;
-    //        rgb_to_hsv(rgb_pixel[0], rgb_pixel[1], rgb_pixel[2], &h, &s, &v);
-    //        Vec3b hsv_pixel = Vec3b((uchar)h, (uchar)(s * 255), (uchar)(v * 255));
-    //        img(i, j) = hsv_pixel;
-    //    }
-    //}
-    //
-    
-    //Mat img_out = img.clone();
-
     for (int i = 0; i < bad_pixels.size(); i++) {
         Pixel_Data bad_pixel = bad_pixels[i];
         if (bad_pixel.x >= 0 && bad_pixel.x < img_out.cols && bad_pixel.y >= 0 && bad_pixel.y < img_out.rows) {
-            printf("rows: %d, cols: %d, x: %d, y: %d\n", img_out.rows, img_out.cols, bad_pixel.x, bad_pixel.y);
-            //Pixel &p = img_out.at<Pixel>(bad_pixel.y, bad_pixel.x);
-            //Pixel &p = img_out.at<Pixel>(10, 10);
+          //  printf("rows: %d, cols: %d, x: %d, y: %d\n", img_out.rows, img_out.cols, bad_pixel.x, bad_pixel.y);
             img_out.at<Pixel>(10, 10) = Pixel(bad_pixel.pixel.x, bad_pixel.pixel.y, bad_pixel.pixel.z);
-            //img(314, 417) = Pixel(bad_pixel.pixel.x, bad_pixel.pixel.y, bad_pixel.pixel.z);
             Pixel &p= img.at<Pixel>(314, 437);
             img_out.at<Pixel>(314, 437) = Pixel(bad_pixel.pixel.x, bad_pixel.pixel.y, bad_pixel.pixel.z);
             img_out.at<Pixel>(bad_pixel.x, bad_pixel.y) = Pixel(255, 255, 255);
             img_out.at<Pixel>(bad_pixel.x, bad_pixel.y) = Pixel(bad_pixel.pixel.x, bad_pixel.pixel.y, bad_pixel.pixel.z);
-/*            img_out.at<Vec3b>(10, 10) = Vec3b(bad_pixel.pixel.x, bad_pixel.pixel.y, bad_pixel.pixel.z);
-            img_out.at<Vec3b>(314, 437) = Vec3b(bad_pixel.pixel.x, bad_pixel.pixel.y, bad_pixel.pixel.z);
-            img_out.at<Vec3b>(bad_pixel.x, bad_pixel.y) = Vec3b(255, 255, 255);
-            img_out.at<Vec3b>(bad_pixel.x, bad_pixel.y) = Vec3b(bad_pixel.pixel.x, bad_pixel.pixel.y, bad_pixel.pixel.z);
- */       }
+        }
     }
-    
-
-
-
-    //cv::Point3f &p = img.at<Point3f>(10, 10);
-    //for (int i = 0; i < bad_pixels.size(); i++) {
-    //    Pixel_Data bad_pixel = bad_pixels[i];
-    //    if (bad_pixel.x >= 0 && bad_pixel.x < img_out.cols && bad_pixel.y >= 0 && bad_pixel.y < img_out.rows) {
-    //        printf("rows: %d, cols: %d, x: %d, y: %d\n", img_out.rows, img_out.cols, bad_pixel.x, bad_pixel.y);
-    //        //Pixel &p = img_out.at<Pixel>(bad_pixel.y, bad_pixel.x);
-    //        Pixel &p = img_out.at<Pixel>(10, 10);
-    //        //p.x = bad_pixel.pixel.x;
-    //        //p.y = bad_pixel.pixel.y;
-    //        //p.z = bad_pixel.pixel.z;
-    //    }
-    //}
     return img_out;
 }
 
@@ -412,10 +326,10 @@ void part_four()
         bad_pixels[i].pixel.x = 0; // uid_rgb(gen);
         bad_pixels[i].pixel.y = 0; // uid_rgb(gen);
         bad_pixels[i].pixel.z = 255; // uid_rgb(gen);
-        printf("Pixel[%d] = (x: %d, y:%d, pixel(r,g,b) = (%d, %d, %d)\n", i, bad_pixels[i].x, bad_pixels[i].y,
-            bad_pixels[i].pixel.x, bad_pixels[i].pixel.y, bad_pixels[i].pixel.z);
+        //printf("Pixel[%d] = (x: %d, y:%d, pixel(r,g,b) = (%d, %d, %d)\n", i, bad_pixels[i].x, bad_pixels[i].y,
+           // bad_pixels[i].pixel.x, bad_pixels[i].pixel.y, bad_pixels[i].pixel.z);
     }
-    printf("cols: %d, rows: %d\n", img_1.cols, img_1.rows);
+    //printf("cols: %d, rows: %d\n", img_1.cols, img_1.rows);
 
     Mat img_with_noise = apply_constant_noise(img_1, bad_pixels);
     imshow("Constant noise", img_with_noise);

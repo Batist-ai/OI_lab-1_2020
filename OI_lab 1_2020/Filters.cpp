@@ -6,10 +6,6 @@ using namespace cv;
 
 // Filter
 
-//Pixel Filter::calculateNewPixel(Mat sourceImage, int x, int y) {
-//    return Pixel(sourceImage.at<Pixel>(x, y));
-//}
-
 Mat Filter::preprocessImage(Mat sourceImage) {
     return sourceImage;
 }
@@ -116,18 +112,18 @@ void GaussianFilter::createGaussianKernel()
     for (int i = -radius; i <= radius; i++) {
         for (int j = -radius; j <= radius; j++) {
             int idK = (i + radius) * cols + j + radius;
-            printf("idk: %d\n", idK);
+            //printf("idk: %d\n", idK);
             m_kernel[idK] = (float)(exp(-(i * i + j * j) / (2 * m_sigma * m_sigma)));
             norm += m_kernel[idK];
         }
     }
-    print_kernel("Print initialized kernel");
+    // print_kernel("Print initialized kernel");
 
     for (size_t i = 0; i < cols; i++)
         for (size_t j = 0; j < cols; j++)
             m_kernel[i * cols + j] /= norm;
 
-    print_kernel("Print normilized kernel");
+    // print_kernel("Print normilized kernel");
 }
 
 
@@ -148,7 +144,7 @@ void MedianFilter::createKernel()
             m_kernel[idK] = 1.0;
         }
     }
-    print_kernel("Print initialized kernel");
+    // print_kernel("Print initialized kernel");
 }
 
 Pixel MedianFilter::calculateNewPixel(Mat sourceImage, int y, int x) {
@@ -165,27 +161,19 @@ Pixel MedianFilter::calculateNewPixel(Mat sourceImage, int y, int x) {
             int idY = Clamp(y + i, 0, sourceImage.rows - 1);
             Pixel &p = sourceImage.at<Pixel>(idY, idX);
             int idK = (j + radiusX) * m_cols + i + radiusY;
-            //m_kernel[idK] = (0.2126 * p.x + 0.7152 * p.y + 0.0722 * p.z);
             r[idK] = p.x;
             g[idK] = p.y;
             b[idK] = p.z;
         }
     }
-    //sort(m_kernel.begin(), m_kernel.end());
     sort(r.begin(), r.end());
     sort(g.begin(), g.end());
     sort(b.begin(), b.end());
-    //int median_Y = Clamp(m_kernel[m_kernel.size() / 2], 0, 255);
     int median_R = Clamp(r[r.size() / 2], 0, 255);
     int median_G = Clamp(g[g.size() / 2], 0, 255);
     int median_B = Clamp(b[b.size() / 2], 0, 255);
     Pixel &p = sourceImage.at<Pixel>(y, x);
     int br = 255;
-    //return Pixel(
-    //    p.x * median_Y / br,
-    //    p.y * median_Y / br,
-    //    p.z * median_Y / br
-    //);
     return Pixel(
         median_R,
         median_G,
@@ -221,11 +209,6 @@ Filter *ProcessingTask::createFilter(std::string name) {
     Filter *filter = NULL;
     if (name == "GaussianFilter") {
         filter = new GaussianFilter();
-        //} else if (name == "GaussianFilter") {
-    //    filter = GaussianFilter();
-
-    //} else {
-    //    filter = null;
     }
     return filter;
 
