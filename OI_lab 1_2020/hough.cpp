@@ -58,7 +58,7 @@ cv::Mat hough_circle_detection(cv::Mat img, std::vector<cv::Vec3b> &circles, flo
 
                     if (local_max)
                     {
-                        std::cout << circle_centers.at<float>(a, b) << " ";
+                        //std::cout << circle_centers.at<float>(a, b) << " ";
                         draw_circle(img_circle, a, b, r);
                         circles.push_back(cv::Vec3b(a, b, r));
                     }
@@ -73,7 +73,7 @@ cv::Mat hough_ellipse_detection(cv::Mat img, std::vector<cv::Vec3b> &circles, fl
 {
     cv::Mat img_edge, img_ellipse;
     Canny(img, img_edge, 75, 200, 3, true);
-    //return img_edge;
+    ////return img_edge;
     int max_r = std::min(img_edge.rows, img_edge.cols) / 2;
     img_ellipse = cv::Mat::zeros(img.rows, img.cols, CV_8U);
 
@@ -86,7 +86,7 @@ cv::Mat hough_ellipse_detection(cv::Mat img, std::vector<cv::Vec3b> &circles, fl
             cv::Mat ellipse_centers = cv::Mat::zeros(img.rows, img.cols, CV_32F);
             temp.push_back(ellipse_centers);
         }
-        //cout<<temp.size()<<" "<<max_r / rad_step<<endl;
+        std::cout<<temp.size()<<" "<<max_r / rad_step<< "\n";
         accumelator.push_back(temp);
     }
 
@@ -167,7 +167,7 @@ cv::Mat hough_ellipse_detection(cv::Mat img, std::vector<cv::Vec3b> &circles, fl
 
 void draw_circle(cv::Mat & img, int a, int b, int r) {
     circle(img, cv::Point(b, a), r, cv::Scalar(255));
-    std::cout << a << " " << b << " " << r << std::endl;
+   //! std::cout << a << " " << b << " " << r << std::endl;
 }
 
 void print_detection_stat(std::vector<cv::Vec3b> &circles) {

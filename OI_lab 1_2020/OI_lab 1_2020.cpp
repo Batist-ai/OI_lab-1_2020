@@ -405,7 +405,7 @@ void part_five() {
     char img_1_gs_name[] = "D:\\3e635-gs.jpg";
 
     Mat img_1 = imread(img_1_name, cv::IMREAD_COLOR);
-    printf("TYPE_MASK: %d, channels: %d)\n", img_1.TYPE_MASK, img_1.channels());
+    //printf("TYPE_MASK: %d, channels: %d)\n", img_1.TYPE_MASK, img_1.channels());
     imshow("Source color image", img_1);
     //waitKey(1000);
     if (!img_1.data) {
