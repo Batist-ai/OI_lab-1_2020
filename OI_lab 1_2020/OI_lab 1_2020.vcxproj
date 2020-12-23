@@ -156,13 +156,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="canny.cpp" />
     <ClCompile Include="Filters.cpp" />
+    <ClCompile Include="hough.cpp" />
     <ClCompile Include="OI_lab 1_2020.cpp" />
     <ClCompile Include="qmetrics.cpp" />
     <ClCompile Include="rgbhsv.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="canny.h" />
     <ClInclude Include="Filters.h" />
+    <ClInclude Include="hough.h" />
     <ClInclude Include="OI_lab 1_2020.h" />
     <ClInclude Include="pixel.h" />
     <ClInclude Include="qmetrics.h" />

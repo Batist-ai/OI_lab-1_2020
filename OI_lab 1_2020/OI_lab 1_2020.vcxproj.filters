@@ -27,6 +27,12 @@
     <ClCompile Include="Filters.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="canny.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="hough.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="qmetrics.h">
@@ -42,6 +48,12 @@
       <Filter>Исходные файлы</Filter>
     </ClInclude>
     <ClInclude Include="Filters.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="canny.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="hough.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

@@ -13,6 +13,8 @@
 #include "qmetrics.h"
 #include "rgbhsv.h"
 #include "filters.h"
+#include "canny.h"
+#include "hough.h"
 #include "OI_lab 1_2020.h"
 
 
@@ -35,7 +37,8 @@ int main(int argc, char** argv)
 	//part_one();
 	//part_two();
 	//part_three();
-    part_four();
+    // part_four();
+    part_five();
 
 	return 0;
 }
@@ -310,6 +313,7 @@ void part_four()
     //waitKey(6000);
     if (!img_1.data) {
         printf("Image not loaded.");
+        return;
     }
 
     std::vector<Pixel_Data> bad_pixels(100);
@@ -346,7 +350,7 @@ void part_four()
     auto duration = duration_cast<std::chrono::milliseconds>(stop - start);
     imshow("Noised image after gf", img_after_gf);
     waitKey(10);
-    printf("\n\nQuality metrics for image with filtered noise [GaussianFilter (%d ms)]\n", duration.count());
+    printf("\n\nQuality metrics for image with filtered noise [GaussianFilter (%d ms)]\n", int(duration.count()));
     compute_quality_metrics(img_1, img_after_gf, 10);
     
     auto mf = new MedianFilter();
@@ -357,7 +361,7 @@ void part_four()
     stop = high_resolution_clock::now();
     duration = duration_cast<std::chrono::milliseconds>(stop - start);
     waitKey(5000);
-    printf("\n\nQuality metrics for image with filtered noise [MedianFilter (%d ms)]\n", duration.count());
+    printf("\n\nQuality metrics for image with filtered noise [MedianFilter (%d ms)]\n", int(duration.count()));
     compute_quality_metrics(img_1, img_after_mf, 10);
 
     //printf("avg1=%f, dev1=%f, avg2=%f, dev2=%f\n\n", img_1_mean.val[0], img_1_dev.val[0], img_2_mean.val[0], img_2_dev.val[0]);
@@ -367,14 +371,14 @@ void part_four()
     //waitKey(10);
 
     Mat img_after_opencv_gf;
-    size_t kernel_size = 3;
+    int kernel_size = 3;
     double sigma = 2.0;
     start = high_resolution_clock::now();
     GaussianBlur(img_1, img_after_opencv_gf, Size(kernel_size, kernel_size), sigma);
     stop = high_resolution_clock::now();
     duration = duration_cast<std::chrono::milliseconds>(stop - start); 
     imshow("Noised image after opencv gf", img_after_opencv_gf);
-    printf("\n\nQuality metrics for image with filtered noise [GaussianFilter (%d ms)]\n", duration.count());
+    printf("\n\nQuality metrics for image with filtered noise [GaussianFilter (%d ms)]\n", int(duration.count()));
     compute_quality_metrics(img_after_gf, img_after_opencv_gf, 10);
     waitKey(5000);
 
@@ -384,7 +388,7 @@ void part_four()
     stop = high_resolution_clock::now();
     duration = duration_cast<std::chrono::milliseconds>(stop - start);
     imshow("Noised image after opencv mf", img_after_opencv_mf);
-    printf("\n\nQuality metrics for image with filtered noise [MedianFilter (%d ms)]\n", duration.count());
+    printf("\n\nQuality metrics for image with filtered noise [MedianFilter (%d ms)]\n", int(duration.count()));
     compute_quality_metrics(img_after_mf, img_after_opencv_mf, 10);
     waitKey(5000);
 
@@ -394,4 +398,57 @@ void part_four()
 
 }
 
+
+void part_five() {
+    //char img_1_name[] = "D:\\3e635.jpg";
+    char img_1_name[] = "D:\\coins.jpg";
+    char img_1_gs_name[] = "D:\\3e635-gs.jpg";
+
+    Mat img_1 = imread(img_1_name, cv::IMREAD_COLOR);
+    printf("TYPE_MASK: %d, channels: %d)\n", img_1.TYPE_MASK, img_1.channels());
+    imshow("Source color image", img_1);
+    //waitKey(1000);
+    if (!img_1.data) {
+        printf("Image not loaded.");
+    }
+
+    Mat img_2 = img_1.clone();
+    Mat contours;
+    Canny(img_2, contours, 100, 200);
+    imshow("OCV Canny contours", contours);
+    waitKey(1000);
+
+    Mat img_my_canny = img_1.clone();
+    Mat my_contours;
+    canny(img_2, my_contours, 10, 70);
+    imshow("My Canny contours 10, 100", my_contours);
+
+    cv::Mat img_added = img_1.clone();
+    std::vector<cv::Vec3b> circles(0);
+    cv::Mat img_circles = hough_circle_detection(contours, circles, 20.0f, 20, 20, 20);
+    for (size_t i = 0; i < circles.size(); i++) {
+        circle(img_added, cv::Point(circles[i][1], circles[i][0]), circles[i][2], cv::Scalar(255));
+    }
+    imshow("My added circle det", img_added);
+    
+    //cv::Mat img_blending = img_1.clone();
+    //for (size_t i = 0; i < img_blending.rows; i++) {
+    //    for (size_t j = 0; j < img_blending.cols; j++) {
+    //        cv::Vec3b &dst = img_blending.at<cv::Vec3b>(i, j);
+    //        //uchar &add = img_circles.at<uchar>(i, j);
+    //        //if (add) {
+    //        //    dst[0] = 0;
+    //        //    dst[1] = 255;
+    //        //    dst[2] = 0;
+    //        //}
+    //    }
+    //}
+    //imshow("My blending", img_blending);
+
+    imshow("img_circles", img_circles);
+    print_detection_stat(circles);
+
+    compute_quality_metrics(contours, my_contours, 10); 
+    waitKey(30000);
+}
 
